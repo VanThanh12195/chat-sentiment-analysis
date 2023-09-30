@@ -20,7 +20,7 @@ export default function Chat() {
     });
     return () => {
       channel.unbind("new-message");
-      pusher.unsubscribe("chat-channel");
+      pusher.unsubscribe("chat-room");
     };
   }, []);
 
