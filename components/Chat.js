@@ -32,7 +32,7 @@ export default function Chat() {
     }
 
     try {
-      const response = await axios.post("http://localhost:4000/chat", {
+      const response = await axios.post("http://localhost:3000/api/chat", {
         message: newMessage,
       });
 
