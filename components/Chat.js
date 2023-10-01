@@ -9,11 +9,11 @@ export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
+  const [isSubscribed, setIsSubscribed] = useState(true);
+
   const searchParams = useSearchParams();
 
   const name = searchParams.get("name");
-
-  console.log("log in " + name);
 
   useEffect(() => {
     const pusher = new Pusher("6df44b3f6096c951d0af", {
@@ -30,7 +30,7 @@ export default function Chat() {
       channelAuthorization: {
         endpoint: "api/pusher/auth",
         transport: "ajax",
-        params: {},
+        params: { userName: name },
         headers: {},
         customHandler: null,
       },
@@ -39,13 +39,14 @@ export default function Chat() {
     pusher.signin();
 
     pusher.bind("pusher:signin_success", (data) => {
-      console.log("Welcome " + JSON.parse(data.user_data).user_info.name);
+      // console.log("Welcome " + JSON.parse(data.user_data).user_info.name);
     });
 
     const channel = pusher.subscribe("private-chat-room");
 
     channel.bind("pusher:subscription_error", (error) => {
       var { status } = error;
+      setIsSubscribed(false);
       console.log("channel subscription error is " + status);
     });
 
@@ -59,7 +60,7 @@ export default function Chat() {
 
     pusher.connection.bind("connected", (data) => {
       // return a socketId
-      console.log("socketId object is " + JSON.stringify(data));
+      // console.log("socketId object is " + JSON.stringify(data));
     });
 
     return () => {
@@ -75,16 +76,18 @@ export default function Chat() {
       return;
     }
 
-    try {
-      const response = await axios.post("http://localhost:3000/api/chat", {
-        message: newMessage,
-      });
+    if (isSubscribed) {
+      try {
+        const response = await axios.post("http://localhost:3000/api/chat", {
+          message: newMessage,
+        });
 
-      console.log("Message sent successfully:", response.data);
+        console.log("Message sent successfully:", response.data);
 
-      setNewMessage("");
-    } catch (error) {
-      console.error("Error sending message:", error);
+        setNewMessage("");
+      } catch (error) {
+        console.error("Error sending message:", error);
+      }
     }
 
     setNewMessage("");
@@ -92,7 +95,7 @@ export default function Chat() {
 
   return (
     <div>
-      <h1>Chat</h1>
+      <h1>Good morning {name}</h1>
       <div className="message-container">
         {messages.map((message, index) => (
           <div key={index} className="message">

@@ -1,3 +1,5 @@
+import { NextResponse } from "next/server";
+
 const Pusher = require("pusher");
 
 const pusher = new Pusher({
@@ -10,13 +12,18 @@ const pusher = new Pusher({
 
 export async function POST(req) {
   const data = await req.text();
-  const [socketId, channelName] = data
+  const [socketId, channelName, userName] = data
     .split("&")
     .map((str) => str.split("=")[1]);
 
-    const authResponse = pusher.authorizeChannel(socketId, channelName);
+  const listUserName = ["thanh", "ronaldo"];
 
-    console.log("channel auth is " + JSON.stringify(authResponse));
+  if (!listUserName.includes(userName))
+    return new NextResponse(JSON.stringify("Invalid user name"), {
+      status: 403,
+    });
 
-  return new Response(JSON.stringify(authResponse));
+  const authResponse = pusher.authorizeChannel(socketId, channelName);
+
+  return new NextResponse(JSON.stringify(authResponse));
 }
