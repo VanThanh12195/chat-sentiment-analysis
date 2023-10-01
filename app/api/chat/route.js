@@ -13,7 +13,7 @@ const pusher = new Pusher({
 export async function POST(req) {
   const { message } = await req.json();
 
-  pusher.trigger("chat-room", "new-message", {
+  pusher.trigger("private-chat-room", "new-message", {
     message: message,
   });
 

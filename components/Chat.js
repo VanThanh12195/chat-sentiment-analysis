@@ -11,13 +11,50 @@ export default function Chat() {
   useEffect(() => {
     const pusher = new Pusher("6df44b3f6096c951d0af", {
       cluster: "us2",
+      userAuthentication: {
+        endpoint: "api/pusher/user-auth",
+        transport: "ajax",
+        params: {},
+        headers: {},
+        paramsProvider: null,
+        headersProvider: null,
+        customHandler: null,
+      },
+      channelAuthorization: {
+        endpoint: "api/pusher/auth",
+        transport: "ajax",
+        params: {},
+        headers: {},
+        customHandler: null,
+      },
     });
 
-    const channel = pusher.subscribe("chat-room");
+    pusher.signin();
+
+    pusher.bind("pusher:signin_success", (data) => {
+      console.log("Welcome " + JSON.parse(data.user_data).user_info.name);
+    });
+
+    const channel = pusher.subscribe("private-chat-room");
+
+    channel.bind("pusher:subscription_error", (error) => {
+      var { status } = error;
+      console.log("channel subscription error is " + status);
+    });
+
+    channel.bind("pusher:subscription_succeeded", (data) => {
+      console.log("channel subscription is " + JSON.stringify(data));
+    });
 
     channel.bind("new-message", (data) => {
       setMessages((prevMessages) => [...prevMessages, data.message]);
     });
+
+    pusher.connection.bind("connected", (data) => {
+      // return a socketId
+      console.log("socketId object is " + JSON.stringify(data));
+    });
+
     return () => {
       channel.unbind("new-message");
       pusher.unsubscribe("chat-room");
