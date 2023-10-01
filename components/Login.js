@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 function Login() {
   const router = useRouter();
@@ -14,7 +15,7 @@ function Login() {
 
   const handleJoinClick = () => {
     if (username === "") alert("Please input your name!");
-    else router.push("/chat");
+    else router.push(`/chat/?name=${username}`);
   };
 
   return (
@@ -42,7 +43,6 @@ function Login() {
             className="bg-blue-500 active:scale-95 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="button"
             onClick={handleJoinClick}
-            k
           >
             Join
           </button>

@@ -3,10 +3,17 @@
 import React, { useEffect, useState } from "react";
 import Pusher from "pusher-js";
 import axios from "axios";
+import { useSearchParams } from "next/navigation";
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+
+  const searchParams = useSearchParams();
+
+  const name = searchParams.get("name");
+
+  console.log("log in " + name);
 
   useEffect(() => {
     const pusher = new Pusher("6df44b3f6096c951d0af", {
